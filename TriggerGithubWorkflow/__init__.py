@@ -1,6 +1,6 @@
 import logging
 import requests
-
+import os
 import azure.functions as func
 
 
@@ -12,6 +12,12 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     repo = req.params.get('repo')
     req_body = req.get_json()
     secret = req_body.get('secret')
+
+    # verifiy that the call is from prismic
+    prismiSecret = os.environ["prismic_secret"]
+    if prismiSecret != str(secret):
+        return func.HttpRequest("Verification failed", status_code = 400)
+
     data = {
         'event_type': 'prismic'
     }
